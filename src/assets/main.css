@@ -1,27 +1,48 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-
+  height: 100vh;
   font-weight: normal;
+  background-image: url('./images/bg.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-a,
-.green {
+a {
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
+  color: rgba(255, 255, 255, 1);
+  font-weight: 200;
+  font-size: large;
+  font-family: 'VCR OSD Mono', sans-serif;
   transition: 0.4s;
 }
 
-@media (hover: hover) {
+button {
+  width: 100%;
+  background-color: white;
+  border: 0;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  font-family: 'VCR OSD Mono', sans-serif;
+  font-size: large;
+  box-shadow: none;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+/* button hover时添加阴影 */
+button:hover {
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+/* @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
   }
-}
+} */
 
-@media (min-width: 1024px) {
+/* @media (min-width: 1024px) {
   body {
     display: flex;
     place-items: center;
@@ -32,4 +53,4 @@ a,
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
-}
+} */

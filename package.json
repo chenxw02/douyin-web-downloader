@@ -12,7 +12,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "js-confetti": "^0.11.0",
     "vue": "^3.2.47",
+    "vue-confetti": "^2.3.0",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
