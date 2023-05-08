@@ -1,12 +1,13 @@
 @import './base.css';
 
 #app {
-  height: 100vh;
+  min-height: 100vh;
   font-weight: normal;
-  background-image: url('./images/bg.png');
+  background: linear-gradient(to bottom right, blue, pink);
+  /* background-image: url('./images/bg.png');
   background-size: cover;
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: center; */
 }
 
 a {
@@ -42,15 +43,11 @@ button:hover {
   }
 } */
 
-/* @media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
+@media (max-height: 99vh) {
   #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+    background-image: url('./images/blur.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
   }
-} */
+}
