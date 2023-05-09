@@ -67,7 +67,7 @@ const close = () => {
     transition: opacity 0.3s ease-in-out;
 }
 
-.fade-enter,
+.fade-enter-from,
 .fade-leave-to {
     opacity: 0;
 }
