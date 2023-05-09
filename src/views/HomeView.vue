@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref} from 'vue';
 import JSConfetti from 'js-confetti'
 import { singleRequest } from '@/service/singleRequest';
 import LoadAni from '@/components/LoadAni.vue';
@@ -31,17 +31,22 @@ async function submit() {
 
 async function go() {
   Loading.value = true
-  const data = await singleRequest(url1.value)
   images.value = []
   video.value = ''
+  const res = await singleRequest(url1.value)
+  const data = res?.data
+  if(res?.status !== 200) {
+    Loading.value = false
+    alert('Please check your URL')
+  }
   if (data['type'] === 'images' && data['urls']) {
     for (let i = 0; i < data['urls'].length; i++) {
       images.value.push(data['urls'][i])
     }
     console.log(images.value)
   } else if (data['type'] === 'video' && data['urls']) {
-    videos.value = data['urls'][0]
-    console.log(videos.value)
+    video.value = data['urls'][0]
+    console.log(video.value)
   }
 }
 
@@ -76,7 +81,7 @@ const onImageLoad = () => {
           <img :src="image" alt="image" @load="onImageLoad" />
         </div>
       </div>
-      <div v-if="videos">
+      <div v-if="video">
         <!-- <video :src="videos" controls="controls" autoplay="autoplay" loop="loop" muted="muted"></video> -->
       </div>
     </div>

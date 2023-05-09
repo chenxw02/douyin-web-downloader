@@ -7,7 +7,7 @@ export const singleRequest = async (url: string) => {
 
     try {
         const res = await axios.post('http://localhost:8080/geturls', data);
-        return res.data;
+        return res;
     } catch (error) {
         console.log(error);
     }

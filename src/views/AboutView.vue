@@ -1,6 +1,19 @@
+<script setup lang="ts">
+import MessageCard from '@/components/MessageCard.vue';
+import { ref } from 'vue'
+const showMessage = ref(false)
+const close = () => {
+  showMessage.value = false
+}
+const open = () => {
+  showMessage.value = !showMessage.value
+}
+</script>
+
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <button @click="open">Show Message</button>
+    <MessageCard message="hhhh" :visible="showMessage" @close="close"/>
   </div>
 </template>
 
@@ -12,4 +25,5 @@
     align-items: center;
   }
 }
+
 </style>
