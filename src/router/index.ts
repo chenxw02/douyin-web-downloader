@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +20,17 @@ const router = createRouter({
       component: () => import('../views/AboutView.vue')
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  NProgress.configure({ showSpinner: false });
+  NProgress.start()
+  next()
+})
+
+// 在全局后置钩子中结束加载效果
+router.afterEach(() => {
+  NProgress.done()
 })
 
 export default router

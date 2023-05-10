@@ -3,11 +3,14 @@ import { ref} from 'vue';
 import JSConfetti from 'js-confetti'
 import { singleRequest } from '@/service/singleRequest';
 import LoadAni from '@/components/LoadAni.vue';
+import MessageCard from '@/components/MessageCard.vue';
+import { Type } from '@/components/interface/enums';
 
 const url1 = ref('')
 const jsConfetti = new JSConfetti()
 const images = ref<any>([])
 const video = ref('')
+const message = ref('')
 let imageCount = 0
 const Loading = ref(false)
 
@@ -37,7 +40,8 @@ async function go() {
   const data = res?.data
   if(res?.status !== 200) {
     Loading.value = false
-    alert('Please check your URL')
+    message.value = 'Please check your URL'
+    return
   }
   if (data['type'] === 'images' && data['urls']) {
     for (let i = 0; i < data['urls'].length; i++) {
@@ -63,13 +67,14 @@ const onImageLoad = () => {
 
 <template>
     <LoadAni v-if="Loading" />
+    <MessageCard :message="message" :visible="message !== ''" @close="message = ''"/>
     <div class="intro" v-show="!Loading">
       <h1>Douyin Downloader</h1>
     </div>
     <div class="main-input" v-show="!Loading">
       <textarea v-model="url1" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
       <div class="submit">
-        <button @click="go">GO></button>
+        <button @click="go">GO</button>
       </div>
     </div>
     <div class="gallery-info">
@@ -77,7 +82,7 @@ const onImageLoad = () => {
     </div>
     <div class="gallery" v-if="images.length > 0 || video.length > 0" v-show="!Loading">
       <div v-if="images.length > 0">
-        <div v-for="image in images" class="image-item">
+        <div v-for="image in images" :key="image" class="image-item">
           <img :src="image" alt="image" @load="onImageLoad" />
         </div>
       </div>
