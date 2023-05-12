@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref} from 'vue';
+import { ref } from 'vue';
 import JSConfetti from 'js-confetti'
 import { singleRequest } from '@/service/singleRequest';
 import LoadAni from '@/components/LoadAni.vue';
@@ -12,7 +12,7 @@ const images = ref<any>([])
 const video = ref('')
 const message = ref('')
 let imageCount = 0
-const Loading = ref(false)
+const loading = ref(false)
 
 async function submit() {
   const response = await singleRequest(url1.value)
@@ -33,13 +33,13 @@ async function submit() {
 }
 
 async function go() {
-  Loading.value = true
+  loading.value = true
   images.value = []
   video.value = ''
   const res = await singleRequest(url1.value)
   const data = res?.data
-  if(res?.status !== 200) {
-    Loading.value = false
+  if (res?.status !== 200) {
+    loading.value = false
     message.value = 'Please check your URL'
     return
   }
@@ -59,28 +59,28 @@ const onImageLoad = () => {
   imageCount += 1
   if (imageCount === images.value.length) {
     jsConfetti.addConfetti()
-    Loading.value = false
+    loading.value = false
     imageCount = 0
   }
 }
 </script>
 
 <template>
-    <LoadAni v-if="Loading" />
-    <MessageCard :message="message" :visible="message !== ''" @close="message = ''"/>
-    <div class="intro" v-show="!Loading">
+  <LoadAni :loading="loading" />
+  <MessageCard :message="message" :visible="message !== ''" @close="message = ''" />
+  <div class="intro">
       <h1>Douyin Downloader</h1>
     </div>
-    <div class="main-input" v-show="!Loading">
+    <div class="main-input">
       <textarea v-model="url1" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
       <div class="submit">
         <button @click="go">GO</button>
       </div>
     </div>
     <div class="gallery-info">
-        <span>Click to download</span>
+      <span>Click to download</span>
     </div>
-    <div class="gallery" v-if="images.length > 0 || video.length > 0" v-show="!Loading">
+    <div class="gallery" v-if="images.length > 0 || video.length > 0" v-show="!loading">
       <div v-if="images.length > 0">
         <div v-for="image in images" :key="image" class="image-item">
           <img :src="image" alt="image" @load="onImageLoad" />
