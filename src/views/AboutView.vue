@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import LoadAni from '@/components/LoadAni.vue';
 import MessageCard from '@/components/MessageCard.vue';
 import ExpandablePanel from '@/components/ExpandablePanel.vue';
-import { ref } from 'vue'
+import InputButton from '@/components/InputButton.vue';
+import CompositeInputButton from '@/components/CompositeInputButton.vue';
+import { handleError, ref } from 'vue'
 const loading = ref(false)
 const message = ref('')
 const likedURL = ref('')
@@ -11,33 +14,39 @@ const cookie = ref('')
 const open = () => {
   message.value = 'Hello World!'
 }
+
+const handle_likes_submit = (url: string) => {
+  likedURL.value = url
+  open()
+}
+
+const handle_posts_submit = (url: string[]) => {
+  postsURL.value = url[0]
+  cookie.value = url[1]
+}
 </script>
 
 <template>
   <LoadAni :loading="loading" />
   <MessageCard :message="message" :visible="message !== ''" @close="message = ''" />
   <div class="content">
-    <ExpandablePanel panel-name="高级下载">
-      <div class="advanced-downlaod">
+    <div class="advanced-downlaod">
+      <ExpandablePanel panel-name="高级下载">
         <div class="liked-posts">
-          <div class="single-input-container">
-            <input class="single-input" type="text" v-model="likedURL" placeholder="输入框" />
-            <button class="input-button" @click="open">GO</button>
-          </div>
+          <InputButton @submit="handle_likes_submit"/>
         </div>
         <div class="homepage-posts">
-          <div class="connected-input-container">
-            <input class="connected-input first-input" type="text" v-model="postsURL" placeholder="输入框1" />
-            <input class="connected-input second-input" type="text" v-model="cookie" placeholder="输入框2" />
-            <button class="connected-button" @click="open">GO</button>
-          </div>
+          <CompositeInputButton @submit="handle_posts_submit"/>
         </div>
+        </ExpandablePanel>
       </div>
-    </ExpandablePanel>
-    <div class="control-pannel">
-      <div>内容筛选</div>
-      <div>自动下载</div>
-    </div>
+    
+      <div class="control-pannel">
+        <ExpandablePanel panel-name="控制面板">
+        <div style="width: 200px;">内容筛选</div>
+        <div>自动下载</div>
+        </ExpandablePanel>
+      </div>
   </div>
 </template>
 
@@ -52,92 +61,22 @@ const open = () => {
 
 .advanced-downlaod,
 .control-pannel {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 0.3rem;
 }
 
-.advanced-downlaod .button,
-.control-pannel {
-  margin: 10px 0;
+.advanced-downlaod {
+  margin-top: 8vh;
+  margin-bottom: 3vh;
 }
 
 .liked-posts,
 .homepage-posts {
   width: 100%;
   margin: 10px 0;
-}
-
-.single-input-container {
-  display: flex;
-}
-
-.single-input {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 5px;
-  outline: none;
-  font-size: 14px;
-  width: 100%;
-}
-
-.input-button {
-  background-color: #4caf50;
-  border: none;
-  color: white;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  margin-left: 5px;
-  padding: 6px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  height: 35px;
-  width: max-content;
-}
-
-.connected-input-container {
-  display: flex;
-}
-
-.connected-input {
-  display: flex;
-  width: 100%;
-  border: 1px solid #ccc;
-  padding: 5px;
-  outline: none;
-  font-size: 14px;
-}
-
-.first-input {
-  width: 70%;
-  border-right: none;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
-}
-
-.second-input {
-  width: 30%;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-
-.connected-button {
-  background-color: #4caf50;
-  border: none;
-  color: white;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 14px;
-  margin-left: 5px;
-  padding: 6px 12px;
-  cursor: pointer;
-  border-radius: 4px;
-  height: 35px;
-  width: max-content;
 }
 
 @media screen and (max-width: 800px) {
