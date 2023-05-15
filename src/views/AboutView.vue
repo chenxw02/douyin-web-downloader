@@ -4,7 +4,9 @@ import MessageCard from '@/components/MessageCard.vue';
 import ExpandablePanel from '@/components/ExpandablePanel.vue';
 import InputButton from '@/components/InputButton.vue';
 import CompositeInputButton from '@/components/CompositeInputButton.vue';
-import { handleError, ref } from 'vue'
+import EditableTable from '@/components/EditableTable.vue';
+import ToggleButton from '@/components/ToggleButton.vue';
+import { ref } from 'vue'
 const loading = ref(false)
 const message = ref('')
 const likedURL = ref('')
@@ -33,30 +35,41 @@ const handle_posts_submit = (url: string[]) => {
     <div class="advanced-downlaod">
       <ExpandablePanel panel-name="高级下载">
         <div class="liked-posts">
-          <InputButton @submit="handle_likes_submit"/>
+          <InputButton @submit="handle_likes_submit" />
         </div>
         <div class="homepage-posts">
-          <CompositeInputButton @submit="handle_posts_submit"/>
+          <CompositeInputButton @submit="handle_posts_submit" />
         </div>
-        </ExpandablePanel>
-      </div>
-    
-      <div class="control-pannel">
-        <ExpandablePanel panel-name="控制面板">
+      </ExpandablePanel>
+    </div>
+
+    <div class="control-pannel">
+      <ExpandablePanel panel-name="控制面板">
         <div style="width: 200px;">内容筛选</div>
         <div>自动下载</div>
-        </ExpandablePanel>
-      </div>
+      </ExpandablePanel>
+    </div>
+
+    <div class="table">
+      <ExpandablePanel panel-name="下载列表">
+        <EditableTable />
+      </ExpandablePanel>
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* 公共样式 */
 .content {
   width: 45%;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.table {
+  width: 100%;
+  margin-top: 3vh;
+  margin-bottom: 3vh;
 }
 
 .advanced-downlaod,
