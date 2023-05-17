@@ -55,20 +55,10 @@ const handle_posts_submit = (url: string[]) => {
         <EditableTable />
       </ExpandablePanel>
     </div>
-
-    <div class="buttonT">
-    <ToggleButton />
-  </div>
   </div>
 </template>
 
 <style scoped>
-.buttonT {
-  border: 1px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 .content {
   width: 45%;
   display: flex;

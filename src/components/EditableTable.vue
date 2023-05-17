@@ -1,3 +1,75 @@
+<script setup lang="ts">
+import { nextTick, ref } from "vue";
+import ToggleButton from "./ToggleButton.vue";
+
+const rows = ref([
+    "Sample 1",
+    "Sample 2",
+    "Sample 3"
+]);
+
+const editing = ref({
+    row: -1
+});
+
+const editableCell = ref<HTMLElement[] | null>(null)
+
+const editingMode = ref(false);
+
+const handle = (id: any, checked: any) => {
+    console.log(id, checked);
+};
+
+const setEditing = (rowIndex: number) => {
+    editing.value.row = rowIndex;
+};
+
+const startEditing = (rowIndex: number) => {
+    setEditing(rowIndex)
+    nextTick(() => {
+        const tdElement = editableCell.value
+        if (tdElement) {
+            const inputElement = tdElement[rowIndex].querySelector('input')
+            if (inputElement) {
+                inputElement.focus()
+            }
+        }
+    })
+}
+
+const stopEditing = () => {
+    editing.value.row = -1;
+};
+
+const isEditing = (rowIndex: number) => {
+    return editing.value.row === rowIndex;
+};
+
+const updateCellValue = (value: string, rowIndex: number) => {
+    rows.value[rowIndex] = value;
+};
+
+const addRow = () => {
+  rows.value.push("");
+  const newRowIdx = rows.value.length - 1;
+  setEditing(newRowIdx);
+  nextTick(() => {
+    const lastRow = document.querySelector("tr:last-child td:first-child input");
+    if (lastRow) {
+      (lastRow as HTMLInputElement).focus();
+    }
+  });
+};
+
+const toggleEditingMode = () => {
+    editingMode.value = !editingMode.value;
+};
+
+const removeRow = (rowIndex: number) => {
+    rows.value.splice(rowIndex, 1);
+};
+</script>
+
 <template>
     <div>
         <table>
@@ -6,7 +78,7 @@
                     <td ref="editableCell" @dblclick="startEditing(rowIndex, $event)">
                         <span v-if="!isEditing(rowIndex)">{{ row }}</span>
                         <input v-else type="text" :value="row" @input="updateCellValue($event.target.value, rowIndex)"
-                            @blur="setEditing(-1)" />
+                            @blur="setEditing(-1)" @keyup.enter="stopEditing(rowIndex)" />
                     </td>
                     <td class="right-aligned">
                         <img v-if="editingMode" src="../assets/icons/delete.png" @click="removeRow(rowIndex)" />
@@ -24,78 +96,6 @@
         </div>
     </div>
 </template>
-  
-<script>
-import { nextTick } from "vue";
-import ToggleButton from "./ToggleButton.vue";
-
-export default {
-    components: {
-        ToggleButton
-    },
-    data() {
-        return {
-            rows: [
-                "Sample 1",
-                "Sample 2",
-                "Sample 3"
-            ],
-            editing: {
-                row: -1
-            },
-            editingMode: false
-        };
-    },
-    methods: {
-        handle(id, checked) {
-            // console.log(id, checked);
-        },
-        setEditing(rowIndex) {
-            this.editing.row = rowIndex;
-        },
-        startEditing(rowIndex, event) {
-            this.setEditing(rowIndex);
-            this.$nextTick(() => {
-                const tdElement = this.$refs.editableCell[rowIndex];
-                if (tdElement) {
-                    const inputElement = tdElement.querySelector('input');
-                    if (inputElement) {
-                        inputElement.focus();
-                    }
-                }
-            });
-        },
-
-        stopEditing(rowIndex) {
-            this.editing.row = -1;
-        },
-        isEditing(rowIndex) {
-            return this.editing.row === rowIndex;
-        },
-        updateCellValue(value, rowIndex) {
-            this.rows[rowIndex] = value;
-        },
-        printRowData(rowIndex) {
-            console.log(this.rows[rowIndex]);
-        },
-        addRow() {
-            this.rows.push("");
-            const newRowIdx = this.rows.length - 1;
-            this.setEditing(newRowIdx);
-            nextTick(() => {
-                this.$el.querySelector("tr:last-child td:first-child input").focus();
-            });
-        },
-        toggleEditingMode() {
-            this.editingMode = !this.editingMode;
-        },
-        removeRow(rowIndex) {
-            this.rows.splice(rowIndex, 1);
-        }
-
-    }
-};
-</script>
   
 <style scoped>
 table {
