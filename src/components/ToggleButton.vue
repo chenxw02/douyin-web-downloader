@@ -32,7 +32,6 @@ const toggle = () => {
     height: 100%; 
 }
 .toggle-label {
-    display: inline-block;
     width: 50px;
     height: 25px;
     background-color: #ccc;
@@ -43,7 +42,7 @@ const toggle = () => {
 }
 
 .toggle-inner {
-    display: inline-block;
+    /* display: inline-block; */
     width: 22px;
     height: 22px;
     background-color: white;
