@@ -26,6 +26,12 @@ const handle_posts_submit = (url: string[]) => {
   postsURL.value = url[0]
   cookie.value = url[1]
 }
+
+const myData = ref([
+  'some data',
+  'some data',
+  'some data',
+])
 </script>
 
 <template>
@@ -52,7 +58,7 @@ const handle_posts_submit = (url: string[]) => {
 
     <div class="table">
       <ExpandablePanel panel-name="下载列表">
-        <EditableTable />
+        <EditableTable v-model:model-value="myData" />
       </ExpandablePanel>
     </div>
   </div>

@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { nextTick, ref } from "vue";
+import { nextTick, ref, withDefaults } from "vue";
 import ToggleButton from "./ToggleButton.vue";
 
-const rows = ref([
-    "Sample 1",
-    "Sample 2",
-    "Sample 3"
-]);
+interface Props {
+    modelValue: string[],
+}
+
+
+
+const props = defineProps<Props>()
+
+const emits = defineEmits(["update:modelValue"]);
 
 const editing = ref({
     row: -1
@@ -46,19 +50,22 @@ const isEditing = (rowIndex: number) => {
 };
 
 const updateCellValue = (value: string, rowIndex: number) => {
-    rows.value[rowIndex] = value;
+    const updatedRows = [...props.modelValue];
+    updatedRows[rowIndex] = value;
+    emits('update:modelValue', updatedRows);
 };
 
 const addRow = () => {
-  rows.value.push("");
-  const newRowIdx = rows.value.length - 1;
-  setEditing(newRowIdx);
-  nextTick(() => {
-    const lastRow = document.querySelector("tr:last-child td:first-child input");
-    if (lastRow) {
-      (lastRow as HTMLInputElement).focus();
-    }
-  });
+    const updatedRows = [...props.modelValue, ""];
+    const newRowIdx = updatedRows.length - 1;
+    setEditing(newRowIdx);
+    nextTick(() => {
+        const lastRow = document.querySelector("tr:last-child td:first-child input");
+        if (lastRow) {
+            (lastRow as HTMLInputElement).focus();
+        }
+    });
+    emits('update:modelValue', updatedRows);
 };
 
 const toggleEditingMode = () => {
@@ -66,7 +73,9 @@ const toggleEditingMode = () => {
 };
 
 const removeRow = (rowIndex: number) => {
-    rows.value.splice(rowIndex, 1);
+    const updatedRows = [...props.modelValue];
+    updatedRows.splice(rowIndex, 1);
+    emits('update:modelValue', updatedRows);
 };
 </script>
 
@@ -74,11 +83,11 @@ const removeRow = (rowIndex: number) => {
     <div>
         <table>
             <transition-group tag="tbody" name="row">
-                <tr v-for="(row, rowIndex) in rows" :key="rowIndex">
-                    <td ref="editableCell" @dblclick="startEditing(rowIndex, $event)">
+                <tr v-for="(row, rowIndex) in props.modelValue" :key="rowIndex">
+                    <td ref="editableCell" @dblclick="startEditing(rowIndex)">
                         <span v-if="!isEditing(rowIndex)">{{ row }}</span>
                         <input v-else type="text" :value="row" @input="updateCellValue($event.target.value, rowIndex)"
-                            @blur="setEditing(-1)" @keyup.enter="stopEditing(rowIndex)" />
+                            @blur="setEditing(-1)" @keyup.enter="stopEditing()" />
                     </td>
                     <td class="right-aligned">
                         <img v-if="editingMode" src="../assets/icons/delete.png" @click="removeRow(rowIndex)" />
