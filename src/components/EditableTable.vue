@@ -6,8 +6,6 @@ interface Props {
     modelValue: string[],
 }
 
-
-
 const props = defineProps<Props>()
 
 const emits = defineEmits(["update:modelValue"]);
@@ -20,6 +18,8 @@ const editableCell = ref<HTMLElement[] | null>(null)
 
 const editingMode = ref(false);
 
+const unsavedChanges = ref(false);
+
 const handle = (id: any, checked: any) => {
     console.log(id, checked);
 };
@@ -29,20 +29,25 @@ const setEditing = (rowIndex: number) => {
 };
 
 const startEditing = (rowIndex: number) => {
-    setEditing(rowIndex)
-    nextTick(() => {
-        const tdElement = editableCell.value
-        if (tdElement) {
-            const inputElement = tdElement[rowIndex].querySelector('input')
-            if (inputElement) {
-                inputElement.focus()
+    if (!editingMode.value) {
+        setEditing(rowIndex);
+        unsavedChanges.value = true; 
+        nextTick(() => {
+            const tdElement = editableCell.value;
+            if (tdElement) {
+                const inputElement = tdElement[rowIndex].querySelector('input');
+                if (inputElement) {
+                    inputElement.focus();
+                }
             }
-        }
-    })
+        });
+    }
 }
 
 const stopEditing = () => {
+    console.log('stopEditing');
     editing.value.row = -1;
+    unsavedChanges.value = false; 
 };
 
 const isEditing = (rowIndex: number) => {
@@ -68,9 +73,30 @@ const addRow = () => {
     emits('update:modelValue', updatedRows);
 };
 
-const toggleEditingMode = () => {
-    editingMode.value = !editingMode.value;
+const toggleEditingMode = (event: any) => {
+    if (!unsavedChanges.value) {
+        editingMode.value = !editingMode.value;
+    } else {
+        event.preventDefault();
+    }
 };
+
+const handleClickOutside = (event: any) => {
+
+    // 获取进入编辑模式的按钮
+    const editButton = document.querySelector(".footer img:last-child");
+    if (editButton && event.target === editButton) {
+        event.preventDefault();
+        return;
+    }
+
+    if (event.target.closest('td') !== editableCell.value) {
+        stopEditing();
+    }
+};
+
+window.addEventListener('click', handleClickOutside);
+
 
 const removeRow = (rowIndex: number) => {
     const updatedRows = [...props.modelValue];
@@ -85,9 +111,9 @@ const removeRow = (rowIndex: number) => {
             <transition-group tag="tbody" name="row">
                 <tr v-for="(row, rowIndex) in props.modelValue" :key="rowIndex">
                     <td ref="editableCell" @dblclick="startEditing(rowIndex)">
-                        <span v-if="!isEditing(rowIndex)">{{ row }}</span>
+                        <span v-if="!isEditing(rowIndex)" :class="{ 'not-allowed': editingMode }">{{ row }}</span>
                         <input v-else type="text" :value="row" @input="updateCellValue($event.target.value, rowIndex)"
-                            @blur="setEditing(-1)" @keyup.enter="stopEditing()" />
+                             @keyup.enter="stopEditing()" />
                     </td>
                     <td class="right-aligned">
                         <img v-if="editingMode" src="../assets/icons/delete.png" @click="removeRow(rowIndex)" />
@@ -101,7 +127,7 @@ const removeRow = (rowIndex: number) => {
         </table>
         <div class="footer">
             <img src="../assets/icons/add.png" @click="addRow">
-            <img src="../assets/icons/edit.png" @click="toggleEditingMode" />
+            <img src="../assets/icons/edit.png" :class="{ 'not-allowed': unsavedChanges }" @click="toggleEditingMode($event)" />
         </div>
     </div>
 </template>
@@ -184,6 +210,10 @@ button {
     margin-left: 10px;
     margin-top: 20px;
     margin-bottom: 10px;
+}
+
+.not-allowed {
+    cursor: not-allowed;
 }
 </style>
   

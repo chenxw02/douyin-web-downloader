@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import JSConfetti from 'js-confetti'
-import { singleRequest, download_one, muti_url } from '@/service/singleRequest';
+import { geta, singleRequest } from '@/service/data';
 import LoadAni from '@/components/LoadAni.vue';
 import MessageCard from '@/components/MessageCard.vue';
-import { Type } from '@/components/interface/enums';
-import VideoPlayer from '@/components/VideoPlayer.vue';
 
 const inputURL = ref('')
 const jsConfetti = new JSConfetti()
@@ -55,21 +53,19 @@ const handle_single_url = async () => {
   loading.value = true
   images.value = []
   video.value = ''
-  const res = await singleRequest(inputURL.value)
-  const data = res?.data
-  if (res?.status !== 200) {
-    loading.value = false
-    message.value = 'Please check your URL'
-    return
-  }
-  desc.value = data['desc']
-  console.log(desc.value)
-  if (data['type'] === 'images' && data['urls']) {
-    for (let i = 0; i < data['urls'].length; i++) {
-      images.value.push(data['urls'][i])
+  try {
+    const data = await geta(inputURL.value)
+    desc.value = data['desc']
+    console.log(desc.value)
+    if (data['type'] === 'images' && data['urls']) {
+      for (let i = 0; i < data['urls'].length; i++) {
+        images.value.push(data['urls'][i])
+      }
+    } else if (data['type'] === 'video' && data['urls']) {
+      video.value = data['urls'][0]
     }
-  } else if (data['type'] === 'video' && data['urls']) {
-    video.value = data['urls'][0]
+  } catch (error) {
+    console.log(error)
   }
 }
 
@@ -144,73 +140,116 @@ const onVideoLoaded = () => {
 <template>
   <LoadAni :loading="loading" />
   <MessageCard :message="message" :visible="message !== ''" @close="message = ''" />
-  <div class="intro">
-    <h1>Douyin Downloader</h1>
-  </div>
-  <div class="main-input">
-    <textarea v-model="inputURL" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
-    <div class="submit">
+  <div class="home">
+    <div class="title">Douyin Downloader</div>
+    <div class="main">
+      <textarea v-model="inputURL" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
       <button @click="tell">GO</button>
     </div>
-  </div>
-  <div class="gallery" v-if="images.length > 0 || video.length > 0" v-show="showGallery">
-    <div class="gallery-info">
-      <span>{{ desc }}</span>
-      <img src="../assets/icons/download.png" alt="download" @click="download" />
-    </div>
-    <div class="gallery-content">
-      <div class="gallery-image" v-if="images.length > 0">
-        <div v-for="image in images" :key="image" class="image-item">
-          <img :src="image" alt="image" @load="onImageLoad" />
-        </div>
+    <div class="gallery">
+      <div class="desc">{{ desc }}</div>
+      <div class="images" v-if="images.length">
+        <img v-for="image in images" :key="image" :src="image" />
       </div>
-      <div v-if="video" class="gallery-video">
-        <VideoPlayer :url="video" @onVideoLoaded="onVideoLoaded" />
+      <div class="video" v-if="video">
+        <video controls :src="video">
+          对不起，您的浏览器不支持内嵌视频。
+        </video>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-.intro {
+<style scoped lang="scss">
+.home {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 10% 0 0 0;
-}
-
-.intro h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  text-align: center;
-  color: #ffffff;
-  /* background: linear-gradient(to right, rgba(77, 165, 247, 1), rgb(241, 153, 124));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent; */
-}
-
-.main-input {
-  display: flex;
   flex-direction: column;
-  justify-content: top;
-  align-items: stretch;
-  width: 45%;
-  margin: 3rem 0 2rem 0;
-}
+  width: 100%;
+  height: 100%;
 
-.main-input textarea {
-  height: 20vh;
-  border: 0.5rem solid #ffffff;
-  border-radius: 0.3rem;
-  resize: none;
-  outline: none;
-  animation: shadow-pulse 1s infinite;
-}
+  .title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    color: #ffffff;
+    margin: 5% 0 0 0;
+  }
 
-.main-input textarea:not(:placeholder-shown) {
-  box-shadow: 0 0 0 2px rgb(77, 165, 247);
-  animation: none;
+  .main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    margin: 3rem 0 1rem 0;
+
+    & textarea {
+      width: 100%;
+      height: 200px;
+      border: 0.5rem solid #ffffff;
+      border-radius: 0.3rem;
+      resize: none;
+      outline: none;
+      animation: shadow-pulse 1s infinite;
+    }
+
+    & textarea:not(:placeholder-shown) {
+      box-shadow: 0 0 0 2px rgb(77, 165, 247);
+      animation: none;
+    }
+
+    & button {
+      width: 100%;
+      margin-top: 1rem;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .main {
+      width: 90%;
+    }
+  }
+
+  .gallery {
+    width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 0 2rem 0;
+
+    .desc {
+      width: 100%;
+      text-align: left;
+      margin-bottom: 1rem;
+    }
+
+    .images {
+      column-count: 2;
+
+      & img {
+        margin-bottom: 0.5rem;
+        width: 100%;
+        border-radius: 0.5rem;
+      }
+    }
+
+    .video {
+      & video {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 9;
+      }
+    }
+  }
+
+  @media (max-width: 800px) {
+    .gallery {
+      width: 90%;
+    }
+  }
 }
 
 @keyframes shadow-pulse {
@@ -224,83 +263,6 @@ const onVideoLoaded = () => {
 
   100% {
     box-shadow: 0 0 0 2px rgb(77, 165, 247);
-  }
-}
-
-.submit {
-  width: 100%;
-  margin-top: 1rem;
-}
-
-.gallery {
-  width: 45%;
-  display: flex;
-  flex-direction: column;
-  margin: 0 0 2rem 0;
-}
-
-.gallery-info {
-  height: 1rem;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 0 1rem 0;
-}
-
-.gallery-info span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #ffffff;
-}
-
-.gallery-info img {
-  width: 1rem;
-  height: 1rem;
-  cursor: pointer;
-  margin-right: 0.2rem;
-  margin-left: 2rem;
-}
-
-.gallery-content {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.gallery-image {
-  column-count: 2;
-}
-
-.gallery-video {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.image-item {
-  max-width: 100%;
-  margin: 0 0 1rem 0;
-}
-
-.image-item img {
-  width: 100%;
-  border-radius: 0.5rem;
-}
-
-@media screen and (max-width: 800px) {
-  .main-input {
-    width: 80%;
-  }
-
-  .gallery {
-    width: 80%;
   }
 }
 </style>

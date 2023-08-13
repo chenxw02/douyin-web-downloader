@@ -65,11 +65,11 @@ watch(() => props.visible, (val) => {
     font-weight: 500;
 }
 
-.fade-enter-active{
+.fade-enter-active {
     transition: transform 0.2s ease-in-out;
 }
 
-.fade-leave-active{
+.fade-leave-active {
     transition: opacity 0.3s ease-in-out;
 }
 
