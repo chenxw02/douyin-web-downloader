@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import JSConfetti from 'js-confetti';
-import { geta, singleRequest } from '@/service/data';
-import LoadAni from '@/components/LoadAni.vue';
-import MessageCard from '@/components/MessageCard.vue';
-import { ElMessage } from 'element-plus';
+import { getData, singleRequest, download } from '@/service/data';
+import { checkURL } from '@/utils/validate';
+import NProgress from 'nprogress';
 
 const inputURL = ref('');
 const jsConfetti = new JSConfetti();
@@ -51,26 +50,59 @@ const tell = async () => {
 };
 
 const handle_single_url = async () => {
-  showGallery.value = false;
-  loading.value = true;
-  images.value = [];
-  video.value = '';
-  try {
-    const params = {
-      link: inputURL.value,
-    };
-    const data = await geta(params);
-    desc.value = data['desc'];
-    if (data['type'] === 'images' && data['urls']) {
-      for (let i = 0; i < data['urls'].length; i++) {
-        images.value.push(data['urls'][i]);
-      }
-    } else if (data['type'] === 'video' && data['urls']) {
-      video.value = data['urls'][0];
-    }
-  } catch (error) {
-    // console.log(error);
-  }
+  // showGallery.value = false;
+  // NProgress.configure({ showSpinner: false });
+  // NProgress.start();
+  // images.value = [];
+  // video.value = '';
+  // try {
+  //   const params = {
+  //     link: inputURL.value,
+  //   };
+  //   const data = await getData(params);
+  //   desc.value = data['desc'];
+  //   if (data['type'] === 'images' && data['urls']) {
+  //     for (let i = 0; i < data['urls'].length; i++) {
+  //       images.value.push(data['urls'][i]);
+  //     }
+  //   } else if (data['type'] === 'video' && data['urls']) {
+  //     video.value = data['urls'][0];
+  //   }
+  // } catch (error) {
+  //   // console.log(error);
+  // }
+
+  const params = {
+    link: inputURL.value,
+  };
+
+  const data = await download(params);
+  const imageBase64 = data.data;
+
+  // 创建一个 Blob 对象，并指定 MIME 类型为 image/jpeg
+  const blob = new Blob(
+    [
+      new Uint8Array(
+        atob(imageBase64)
+          .split('')
+          .map((char) => char.charCodeAt(0))
+      ),
+    ],
+    { type: 'image/jpeg' }
+  );
+
+  // 创建一个临时的下载链接
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = data.filename; // 下载的文件名
+  link.style.display = 'none';
+
+  // 将链接添加到页面并模拟点击
+  document.body.appendChild(link);
+  link.click();
+
+  // 移除链接
+  document.body.removeChild(link);
 };
 
 const hanle_multi_url = async () => {
@@ -98,56 +130,21 @@ const hanle_multi_url = async () => {
   }
 };
 
-const download = async () => {
-  loading.value = true;
-  const res = await download_one(inputURL.value);
+const onLoad = (event: any) => {
+  const target = event.target;
 
-  if (res?.status !== 200) {
-    loading.value = false;
-    message.value = 'Please check your URL';
-    return;
-  } else {
-    loading.value = false;
-    jsConfetti.addConfetti();
-    const fileName = res?.headers['content-disposition'].split("utf-8''")[1];
-    const fileNameDecoded = decodeURIComponent(fileName);
-    const url = window.URL.createObjectURL(new Blob([res?.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', fileNameDecoded);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+  if (target.classList.contains('image-button')) {
+    imageCount++;
+    if (imageCount !== images.value.length) return;
   }
-};
 
-const onImageLoad = () => {
-  // count.value += 1
-  imageCount += 1;
-  if (imageCount === images.value.length) {
-    jsConfetti.addConfetti();
-    loading.value = false;
-    showGallery.value = true;
-    imageCount = 0;
-  }
-};
-
-const onVideoLoaded = () => {
-  console.log('video loaded');
   jsConfetti.addConfetti();
-  loading.value = false;
+  NProgress.done();
   showGallery.value = true;
 };
 </script>
 
 <template>
-  <LoadAni :loading="loading" />
-  <MessageCard
-    :message="message"
-    :visible="message !== ''"
-    @close="message = ''"
-  />
   <div class="home">
     <div class="title">Douyin Downloader</div>
     <div class="main">
@@ -159,13 +156,20 @@ const onVideoLoaded = () => {
       ></textarea>
       <button @click="tell">GO</button>
     </div>
-    <div class="gallery">
+    <div class="gallery" v-show="showGallery">
       <div class="desc">{{ desc }}</div>
       <div class="images" v-if="images.length">
-        <img v-for="image in images" :key="image" :src="image" />
+        <img
+          v-for="image in images"
+          :key="image"
+          :src="image"
+          @load="onLoad($event)"
+        />
       </div>
       <div class="video" v-if="video">
-        <video controls :src="video">对不起，您的浏览器不支持内嵌视频。</video>
+        <video controls :src="video" @loadeddata="onLoad($event)">
+          对不起，您的浏览器不支持内嵌视频。
+        </video>
       </div>
     </div>
   </div>
