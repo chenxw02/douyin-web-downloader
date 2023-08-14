@@ -73,3 +73,18 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.el-message {
+  background-color: #f0f0f0 !important;
+}
+
+.el-message__icon {
+  display: none !important; /* 隐藏默认图标 */
+}
+
+
+.el-message.el-message--error::before {
+  content: '❌' !important; /* 设置 Emoji */
+  padding-right: 5px;
+  font-size: 12px; /* 可根据需要调整大小 */
+}

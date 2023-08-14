@@ -1,27 +1,29 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import JSConfetti from 'js-confetti'
+import JSConfetti from 'js-confetti';
 import { geta, singleRequest } from '@/service/data';
 import LoadAni from '@/components/LoadAni.vue';
 import MessageCard from '@/components/MessageCard.vue';
+import { ElMessage } from 'element-plus';
 
-const inputURL = ref('')
-const jsConfetti = new JSConfetti()
-const images = ref<any>([])
-const desc = ref('')
-const video = ref('')
-const message = ref('')
-let imageCount = 0
-const loading = ref(false)
-const showGallery = ref(false)
+const inputURL = ref('');
+const jsConfetti = new JSConfetti();
+const images = ref<any>([]);
+const desc = ref('');
+const video = ref('');
+const message = ref('');
+let imageCount = 0;
+const loading = ref(false);
+const showGallery = ref(false);
 
 async function submit() {
-  const response = await singleRequest(inputURL.value)
+  const response = await singleRequest(inputURL.value);
   if (response?.data) {
-    jsConfetti.addConfetti()
-    const fileName = response?.headers['content-disposition'].split('utf-8\'\'')[1]
+    jsConfetti.addConfetti();
+    const fileName =
+      response?.headers['content-disposition'].split("utf-8''")[1];
     const fileNameDecoded = decodeURIComponent(fileName);
-    console.log(fileNameDecoded)
+    console.log(fileNameDecoded);
     const url = window.URL.createObjectURL(new Blob([response?.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -34,53 +36,57 @@ async function submit() {
 }
 
 const tell = async () => {
-  const urls = inputURL.value.split('\n')
+  const urls = inputURL.value.split('\n');
   if (inputURL.value.length === 0) {
-    message.value = 'Please input your URL'
-    return
+    message.value = 'Please input your URL';
+    return;
   } else if (urls.length === 1) {
-    handle_single_url()
-    return
+    handle_single_url();
+    return;
   } else {
-    console.log('muti')
-    hanle_multi_url()
-    return
+    console.log('muti');
+    hanle_multi_url();
+    return;
   }
-}
+};
 
 const handle_single_url = async () => {
-  showGallery.value = false
-  loading.value = true
-  images.value = []
-  video.value = ''
+  showGallery.value = false;
+  loading.value = true;
+  images.value = [];
+  video.value = '';
   try {
-    const data = await geta(inputURL.value)
-    desc.value = data['desc']
-    console.log(desc.value)
+    const params = {
+      link: inputURL.value,
+    };
+    const data = await geta(params);
+    desc.value = data['desc'];
     if (data['type'] === 'images' && data['urls']) {
       for (let i = 0; i < data['urls'].length; i++) {
-        images.value.push(data['urls'][i])
+        images.value.push(data['urls'][i]);
       }
     } else if (data['type'] === 'video' && data['urls']) {
-      video.value = data['urls'][0]
+      video.value = data['urls'][0];
     }
   } catch (error) {
-    console.log(error)
+    // console.log(error);
   }
-}
+};
 
 const hanle_multi_url = async () => {
-  loading.value = true
-  const res = await muti_url(inputURL.value)
+  loading.value = true;
+  const res = await muti_url(inputURL.value);
 
   if (res?.status !== 200) {
-    loading.value = false
-    message.value = 'Please check your URL'
-    return
+    loading.value = false;
+    message.value = 'Please check your URL';
+    return;
   } else {
-    loading.value = false
-    jsConfetti.addConfetti()
-    const fileName = res?.headers['content-disposition'].split('filename=')[1].replace('../mixed/', '')
+    loading.value = false;
+    jsConfetti.addConfetti();
+    const fileName = res?.headers['content-disposition']
+      .split('filename=')[1]
+      .replace('../mixed/', '');
     const url = window.URL.createObjectURL(new Blob([res?.data]));
     const link = document.createElement('a');
     link.href = url;
@@ -90,21 +96,20 @@ const hanle_multi_url = async () => {
     document.body.removeChild(link); // 从 DOM 中删除 a 标签
     window.URL.revokeObjectURL(url); // 释放 URL 对象占用的内存
   }
-}
-
+};
 
 const download = async () => {
-  loading.value = true
-  const res = await download_one(inputURL.value)
+  loading.value = true;
+  const res = await download_one(inputURL.value);
 
   if (res?.status !== 200) {
-    loading.value = false
-    message.value = 'Please check your URL'
-    return
+    loading.value = false;
+    message.value = 'Please check your URL';
+    return;
   } else {
-    loading.value = false
-    jsConfetti.addConfetti()
-    const fileName = res?.headers['content-disposition'].split('utf-8\'\'')[1]
+    loading.value = false;
+    jsConfetti.addConfetti();
+    const fileName = res?.headers['content-disposition'].split("utf-8''")[1];
     const fileNameDecoded = decodeURIComponent(fileName);
     const url = window.URL.createObjectURL(new Blob([res?.data]));
     const link = document.createElement('a');
@@ -115,35 +120,43 @@ const download = async () => {
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
   }
-}
+};
 
 const onImageLoad = () => {
   // count.value += 1
-  imageCount += 1
+  imageCount += 1;
   if (imageCount === images.value.length) {
-    jsConfetti.addConfetti()
-    loading.value = false
-    showGallery.value = true
-    imageCount = 0
+    jsConfetti.addConfetti();
+    loading.value = false;
+    showGallery.value = true;
+    imageCount = 0;
   }
-}
+};
 
 const onVideoLoaded = () => {
-  console.log('video loaded')
-  jsConfetti.addConfetti()
-  loading.value = false
-  showGallery.value = true
-}
-
+  console.log('video loaded');
+  jsConfetti.addConfetti();
+  loading.value = false;
+  showGallery.value = true;
+};
 </script>
 
 <template>
   <LoadAni :loading="loading" />
-  <MessageCard :message="message" :visible="message !== ''" @close="message = ''" />
+  <MessageCard
+    :message="message"
+    :visible="message !== ''"
+    @close="message = ''"
+  />
   <div class="home">
     <div class="title">Douyin Downloader</div>
     <div class="main">
-      <textarea v-model="inputURL" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
+      <textarea
+        v-model="inputURL"
+        placeholder="Paste your URL here"
+        rows="10"
+        cols="50"
+      ></textarea>
       <button @click="tell">GO</button>
     </div>
     <div class="gallery">
@@ -152,9 +165,7 @@ const onVideoLoaded = () => {
         <img v-for="image in images" :key="image" :src="image" />
       </div>
       <div class="video" v-if="video">
-        <video controls :src="video">
-          对不起，您的浏览器不支持内嵌视频。
-        </video>
+        <video controls :src="video">对不起，您的浏览器不支持内嵌视频。</video>
       </div>
     </div>
   </div>
