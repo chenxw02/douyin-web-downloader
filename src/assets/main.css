@@ -48,10 +48,10 @@ button {
 }
 
 /* button hover时添加阴影 */
-button:hover {
+/* button:hover {
   box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
   cursor: pointer;
-}
+} */
 
 /* @media (hover: hover) {
   a:hover {

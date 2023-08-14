@@ -8,7 +8,7 @@ import { onHttpError } from '@/service/client';
 
 const app = createApp(App);
 app.use(router).use(AxiosClientPlugin, {
-  baseURL: 'http://localhost:8088',
+  baseURL: 'http://localhost:8080',
   onHttpError,
 });
 

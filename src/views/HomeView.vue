@@ -1,134 +1,61 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import JSConfetti from 'js-confetti';
 import { getData, singleRequest, download } from '@/service/data';
-import { checkURL } from '@/utils/validate';
+import { checkURL, downloadFromBase64 } from '@/utils/validate';
+import { Mode } from '@/utils/interface';
 import NProgress from 'nprogress';
+import { ElDialog, ElSwitch } from 'element-plus';
 
-const inputURL = ref('');
+const url = ref('');
 const jsConfetti = new JSConfetti();
-const images = ref<any>([]);
+const images = ref<string[]>([]);
 const desc = ref('');
 const video = ref('');
-const message = ref('');
 let imageCount = 0;
-const loading = ref(false);
 const showGallery = ref(false);
+const showAdvance = ref(false);
+const downloadOnly = ref(false);
 
-async function submit() {
-  const response = await singleRequest(inputURL.value);
-  if (response?.data) {
-    jsConfetti.addConfetti();
-    const fileName =
-      response?.headers['content-disposition'].split("utf-8''")[1];
-    const fileNameDecoded = decodeURIComponent(fileName);
-    console.log(fileNameDecoded);
-    const url = window.URL.createObjectURL(new Blob([response?.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', fileNameDecoded);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link); // 从 DOM 中删除 a 标签
-    window.URL.revokeObjectURL(url); // 释放 URL 对象占用的内存
-  }
-}
+const parse = async () => {
+  if (!checkURL(url.value))
+    return;
 
-const tell = async () => {
-  const urls = inputURL.value.split('\n');
-  if (inputURL.value.length === 0) {
-    message.value = 'Please input your URL';
-    return;
-  } else if (urls.length === 1) {
-    handle_single_url();
-    return;
-  } else {
-    console.log('muti');
-    hanle_multi_url();
-    return;
-  }
-};
-
-const handle_single_url = async () => {
-  // showGallery.value = false;
-  // NProgress.configure({ showSpinner: false });
-  // NProgress.start();
-  // images.value = [];
-  // video.value = '';
-  // try {
-  //   const params = {
-  //     link: inputURL.value,
-  //   };
-  //   const data = await getData(params);
-  //   desc.value = data['desc'];
-  //   if (data['type'] === 'images' && data['urls']) {
-  //     for (let i = 0; i < data['urls'].length; i++) {
-  //       images.value.push(data['urls'][i]);
-  //     }
-  //   } else if (data['type'] === 'video' && data['urls']) {
-  //     video.value = data['urls'][0];
-  //   }
-  // } catch (error) {
-  //   // console.log(error);
-  // }
+  beforeLoad();
 
   const params = {
-    link: inputURL.value,
+    link: url.value,
   };
 
-  const data = await download(params);
-  const imageBase64 = data.data;
-
-  // 创建一个 Blob 对象，并指定 MIME 类型为 image/jpeg
-  const blob = new Blob(
-    [
-      new Uint8Array(
-        atob(imageBase64)
-          .split('')
-          .map((char) => char.charCodeAt(0))
-      ),
-    ],
-    { type: 'image/jpeg' }
-  );
-
-  // 创建一个临时的下载链接
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = data.filename; // 下载的文件名
-  link.style.display = 'none';
-
-  // 将链接添加到页面并模拟点击
-  document.body.appendChild(link);
-  link.click();
-
-  // 移除链接
-  document.body.removeChild(link);
-};
-
-const hanle_multi_url = async () => {
-  loading.value = true;
-  const res = await muti_url(inputURL.value);
-
-  if (res?.status !== 200) {
-    loading.value = false;
-    message.value = 'Please check your URL';
-    return;
+  if (!downloadOnly.value) {
+    const data = await getData(params);
+    desc.value = data.desc;
+    switch (data.type) {
+      case 'images':
+        for (let i = 0; i < data.urls.length; i++) {
+          images.value.push(data.urls[i]);
+        }
+        break;
+      case 'video':
+        video.value = data.urls[0];
+        break;
+      default:
+        break;
+    }
   } else {
-    loading.value = false;
-    jsConfetti.addConfetti();
-    const fileName = res?.headers['content-disposition']
-      .split('filename=')[1]
-      .replace('../mixed/', '');
-    const url = window.URL.createObjectURL(new Blob([res?.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link); // 从 DOM 中删除 a 标签
-    window.URL.revokeObjectURL(url); // 释放 URL 对象占用的内存
+    const data = await download(params);
+    downloadFromBase64(data.data, data.filename);
   }
+
 };
+
+const beforeLoad = () => {
+  images.value = [];
+  desc.value = '';
+  showGallery.value = false;
+  NProgress.configure({ showSpinner: false });
+  NProgress.start();
+}
 
 const onLoad = (event: any) => {
   const target = event.target;
@@ -148,23 +75,14 @@ const onLoad = (event: any) => {
   <div class="home">
     <div class="title">Douyin Downloader</div>
     <div class="main">
-      <textarea
-        v-model="inputURL"
-        placeholder="Paste your URL here"
-        rows="10"
-        cols="50"
-      ></textarea>
-      <button @click="tell">GO</button>
+      <textarea v-model="url" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
+      <button @click="parse">GO</button>
+      <button @click="showAdvance = true">Advance</button>
     </div>
     <div class="gallery" v-show="showGallery">
       <div class="desc">{{ desc }}</div>
       <div class="images" v-if="images.length">
-        <img
-          v-for="image in images"
-          :key="image"
-          :src="image"
-          @load="onLoad($event)"
-        />
+        <img v-for="image in images" :key="image" :src="image" @load="onLoad($event)" />
       </div>
       <div class="video" v-if="video">
         <video controls :src="video" @loadeddata="onLoad($event)">
@@ -173,6 +91,9 @@ const onLoad = (event: any) => {
       </div>
     </div>
   </div>
+  <el-dialog v-model="showAdvance" title="Warning" width="30%" center>
+    <el-switch v-model="mode" active-text="仅下载" inactive-text="正常" inline-prompt />
+  </el-dialog>
 </template>
 
 <style scoped lang="scss">
