@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import JSConfetti from 'js-confetti';
-import { getData, singleRequest, download } from '@/service/data';
+import { ref } from 'vue';
+import { getData, download } from '@/service/data';
 import { checkURL, downloadFromBase64 } from '@/utils/validate';
-import { Mode } from '@/utils/interface';
-import NProgress from 'nprogress';
 import { ElDialog, ElSwitch } from 'element-plus';
 
 const url = ref('');
-const jsConfetti = new JSConfetti();
 const images = ref<string[]>([]);
 const desc = ref('');
 const video = ref('');
@@ -18,8 +14,7 @@ const showAdvance = ref(false);
 const downloadOnly = ref(false);
 
 const parse = async () => {
-  if (!checkURL(url.value))
-    return;
+  if (!checkURL(url.value)) return;
 
   beforeLoad();
 
@@ -46,16 +41,13 @@ const parse = async () => {
     const data = await download(params);
     downloadFromBase64(data.data, data.filename);
   }
-
 };
 
 const beforeLoad = () => {
   images.value = [];
   desc.value = '';
   showGallery.value = false;
-  NProgress.configure({ showSpinner: false });
-  NProgress.start();
-}
+};
 
 const onLoad = (event: any) => {
   const target = event.target;
@@ -65,8 +57,6 @@ const onLoad = (event: any) => {
     if (imageCount !== images.value.length) return;
   }
 
-  jsConfetti.addConfetti();
-  NProgress.done();
   showGallery.value = true;
 };
 </script>
@@ -75,14 +65,24 @@ const onLoad = (event: any) => {
   <div class="home">
     <div class="title">Douyin Downloader</div>
     <div class="main">
-      <textarea v-model="url" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
+      <textarea
+        v-model="url"
+        placeholder="Paste your URL here"
+        rows="10"
+        cols="50"
+      ></textarea>
       <button @click="parse">GO</button>
       <button @click="showAdvance = true">Advance</button>
     </div>
     <div class="gallery" v-show="showGallery">
       <div class="desc">{{ desc }}</div>
       <div class="images" v-if="images.length">
-        <img v-for="image in images" :key="image" :src="image" @load="onLoad($event)" />
+        <img
+          v-for="image in images"
+          :key="image"
+          :src="image"
+          @load="onLoad($event)"
+        />
       </div>
       <div class="video" v-if="video">
         <video controls :src="video" @loadeddata="onLoad($event)">
@@ -92,7 +92,12 @@ const onLoad = (event: any) => {
     </div>
   </div>
   <el-dialog v-model="showAdvance" title="Warning" width="30%" center>
-    <el-switch v-model="mode" active-text="仅下载" inactive-text="正常" inline-prompt />
+    <el-switch
+      v-model="downloadOnly"
+      active-text="仅下载"
+      inactive-text="正常"
+      inline-prompt
+    />
   </el-dialog>
 </template>
 
@@ -163,7 +168,9 @@ const onLoad = (event: any) => {
     }
 
     .images {
-      column-count: 2;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 20px;
 
       & img {
         margin-bottom: 0.5rem;

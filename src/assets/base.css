@@ -84,14 +84,6 @@ body {
 }
 
 
-.el-message.el-message--error::before {
-  content: '❌' !important;
-  /* 设置 Emoji */
-  padding-right: 5px;
-  font-size: 12px;
-  /* 可根据需要调整大小 */
-}
-
 .el-switch .el-switch__core {
   /* 设置开关宽度 */
   height: 30px !important;

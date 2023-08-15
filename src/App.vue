@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import Navbar from '@/components/NavBar.vue'
+import { RouterLink, RouterView } from 'vue-router';
+import Navbar from '@/components/NavBar.vue';
+import NProgress from 'nprogress';
+NProgress.configure({ showSpinner: false });
 </script>
 
 <template>
