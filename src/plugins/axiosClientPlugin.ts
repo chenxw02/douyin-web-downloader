@@ -1,5 +1,5 @@
 import { getClient } from '../utils/http';
-import { getAuthInterceptor } from '../utils/login';
+import { getAuthInterceptor, getSilentInterceptor } from '../utils/login';
 import { globalValue } from '../utils/global';
 import type { App } from 'vue';
 
@@ -27,5 +27,25 @@ export const AxiosClientPlugin = {
       ]
     );
     globalValue.client.defaults.withCredentials = false;
+  },
+};
+
+export const SilentAxiosClientPlugin = {
+  install(app: App, options: Options) {
+    const interceptor = getSilentInterceptor();
+    globalValue.silentClient = getClient(
+      {
+        baseURL: options.baseURL,
+      },
+      [
+        interceptor,
+        {
+          response: {
+            onError: options.onHttpError,
+          },
+        },
+      ]
+    );
+    globalValue.silentClient.defaults.withCredentials = false;
   },
 };

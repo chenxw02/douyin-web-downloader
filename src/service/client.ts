@@ -15,3 +15,10 @@ export function getClient(): ReturnType<typeof originGetClient> {
   }
   return globalValue.client;
 }
+
+export function getSilentClient(): ReturnType<typeof originGetClient> {
+  if (!globalValue.silentClient) {
+    throw new Error('globalValue.silentClient is not initialized');
+  }
+  return globalValue.silentClient;
+}

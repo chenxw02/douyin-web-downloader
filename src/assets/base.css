@@ -113,6 +113,20 @@ body {
   /* 设置开关打开时的背景色 */
 }
 
+.el-dialog__header {
+  display: none !important;
+}
+
+.el-dialog {
+  width: 550px !important;
+}
+
+@media (max-width: 800px) {
+  .el-dialog {
+    width: 94% !important;
+  }
+}
+
 /* styles/scrollbar.css */
 
 /* 滚动条轨道 */

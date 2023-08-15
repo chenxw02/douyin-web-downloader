@@ -11,6 +11,8 @@ class GlobalValue {
   vueContext?: AppContext;
   /** Axios Client */
   client?: AxiosInstance;
+
+  silentClient?: AxiosInstance;
   /** Pinia Instance */
   pinia?: Pinia;
 }

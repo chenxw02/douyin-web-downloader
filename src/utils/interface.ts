@@ -13,5 +13,4 @@ export interface DownloadData {
 export enum Mode {
   Normal = 'Normal',
   DownloadOnly = 'DownloadOnly',
-  // 可以根据需要添加更多类型
 }
