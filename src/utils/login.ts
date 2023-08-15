@@ -1,5 +1,6 @@
 import type { AxiosRequestHeaders } from 'axios';
 import type { Interceptor } from './http';
+import { message as Message } from './message';
 import NProgress from 'nprogress';
 import JSConfetti from 'js-confetti';
 export function getAuthInterceptor(): Interceptor {
@@ -19,7 +20,7 @@ export function getAuthInterceptor(): Interceptor {
         NProgress.done();
         if (res.status >= 200 && res.status < 400) {
           if (res.data && res.data.error) {
-            return Promise.reject(res.data);
+            return Promise.reject(res.data.error);
           }
           const jsConfetti = new JSConfetti();
           jsConfetti.addConfetti();

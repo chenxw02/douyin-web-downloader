@@ -1,12 +1,11 @@
 import { message as Message } from '@/utils/message';
 import { getClient as originGetClient } from '../utils/http';
 import { globalValue } from '../utils/global';
+import NProgress from 'nprogress';
 
 export function onHttpError(err: any) {
-  const { status } = err;
-  if (status !== 200) {
-    Message.error('解析失败');
-  }
+  Message.error(err.message || '请求失败');
+  NProgress.done();
   return Promise.reject(err);
 }
 

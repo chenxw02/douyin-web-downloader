@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { getData, download } from '@/service/data';
+import { ref, watch } from 'vue';
+import { getData, download, downloadToAliDrive } from '@/service/data';
 import { checkURL, downloadFromBase64 } from '@/utils/validate';
-import { ElDialog, ElSwitch } from 'element-plus';
+import type { DouyinData } from '@/utils/interface';
 
 const url = ref('');
 const images = ref<string[]>([]);
@@ -10,8 +10,6 @@ const desc = ref('');
 const video = ref('');
 let imageCount = 0;
 const showGallery = ref(false);
-const showAdvance = ref(false);
-const downloadOnly = ref(false);
 
 const parse = async () => {
   if (!checkURL(url.value)) return;
@@ -22,24 +20,35 @@ const parse = async () => {
     link: url.value,
   };
 
-  if (!downloadOnly.value) {
+  if (localStorage.getItem('mode') === 'default') {
     const data = await getData(params);
-    desc.value = data.desc;
-    switch (data.type) {
-      case 'images':
-        for (let i = 0; i < data.urls.length; i++) {
-          images.value.push(data.urls[i]);
-        }
-        break;
-      case 'video':
-        video.value = data.urls[0];
-        break;
-      default:
-        break;
-    }
+    handleData(data);
+  } else if (localStorage.getItem('mode') === 'withAliDrive') {
+    const data = await getData(params);
+    handleData(data);
+    await downloadToAliDrive({
+      ...params,
+      email: localStorage.getItem('email') || '',
+    });
   } else {
     const data = await download(params);
     downloadFromBase64(data.data, data.filename);
+  }
+};
+
+const handleData = (data: DouyinData) => {
+  desc.value = data.desc;
+  switch (data.type) {
+    case 'images':
+      for (let i = 0; i < data.urls.length; i++) {
+        images.value.push(data.urls[i]);
+      }
+      break;
+    case 'video':
+      video.value = data.urls[0];
+      break;
+    default:
+      break;
   }
 };
 
@@ -72,7 +81,6 @@ const onLoad = (event: any) => {
         cols="50"
       ></textarea>
       <button @click="parse">GO</button>
-      <button @click="showAdvance = true">Advance</button>
     </div>
     <div class="gallery" v-show="showGallery">
       <div class="desc">{{ desc }}</div>
@@ -91,14 +99,6 @@ const onLoad = (event: any) => {
       </div>
     </div>
   </div>
-  <el-dialog v-model="showAdvance" title="Warning" width="30%" center>
-    <el-switch
-      v-model="downloadOnly"
-      active-text="仅下载"
-      inactive-text="正常"
-      inline-prompt
-    />
-  </el-dialog>
 </template>
 
 <style scoped lang="scss">

@@ -1,19 +1,27 @@
 import { getClient } from './client';
-import axios from 'axios';
 import type { DouyinData, DownloadData } from '@/utils/interface';
 
 interface getSingleURLParams {
   link: string;
 }
 
+interface downloadToAliDriveParams {
+  link: string;
+  email: string;
+}
+
 export const getData = async (
-  data: getSingleURLParams
+  params: getSingleURLParams
 ): Promise<DouyinData> => {
-  return getClient().post('/getone', data);
+  return getClient().post('/getone', params);
 };
 
 export const download = async (
-  data: getSingleURLParams
+  params: getSingleURLParams
 ): Promise<DownloadData> => {
-  return getClient().post('/download', data);
+  return getClient().post('/download', params);
+};
+
+export const downloadToAliDrive = async (params: downloadToAliDriveParams) => {
+  return getClient().post('/downloadToAliDrive', params);
 };
