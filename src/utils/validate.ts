@@ -1,6 +1,5 @@
 import { message as Message } from '@/utils/message';
 
-
 export const checkEmail = (email: string): boolean => {
   const reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
   !reg.test(email) && Message.warn('请输入正确的邮箱');
@@ -10,7 +9,6 @@ export const checkEmail = (email: string): boolean => {
 export const parseURL = (text: string): string[] => {
   const urlReg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g;
   !text.match(urlReg) && Message.warn('请输入正确的链接');
-  // 剔除重复链接
   return [...new Set(text.match(urlReg) || [])];
 }
 

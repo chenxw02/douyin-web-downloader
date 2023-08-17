@@ -5,10 +5,6 @@
   font-weight: normal;
   background-image: linear-gradient(to bottom right, blue, pink);
   background-size: 400%;
-  /* background-image: url('./images/bg.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center; */
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   animation: bgmove 20s ease-in-out infinite;
 }
@@ -46,13 +42,4 @@ button {
   box-shadow: none;
   transition: box-shadow 0.3s ease-in-out;
   cursor: pointer;
-}
-
-@media (max-height: 99vh) {
-  #app {
-    background-image: url('./images/blur.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
 }

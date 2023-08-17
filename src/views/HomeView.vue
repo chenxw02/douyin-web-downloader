@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { ElDialog, ElInput, ElButton, ElSelect, ElOption } from 'element-plus';
+import { message as Message } from '@/utils/message';
+import { modes } from '@/utils/const';
+import { linkToAliDrive } from '@/service/alidrive';
+import type { DouyinData } from '@/service/data';
 import { getData, download, downloadToAliDrive } from '@/service/data';
 import { checkEmail, parseURL, downloadFromBase64 } from '@/utils/validate';
-import type { DouyinData } from '@/utils/interface';
-import { linkToAliDrive } from '@/service/alidrive';
-import { modes } from '@/utils/const';
-import { message as Message } from '@/utils/message';
 
 const url = ref('');
 const email = ref('');
@@ -43,8 +43,7 @@ const link = async () => {
 
 const parse = async () => {
   const parsedURL = parseURL(url.value);
-  if (!parsedURL.length) console.log('url error');
-  console.log(parsedURL);
+  if (!parsedURL.length) return;
 
   douyinData.value = undefined;
 

@@ -1,17 +1,13 @@
 import { getClient, getSilentClient } from './client';
-import type { DouyinData, DownloadData } from '@/utils/interface';
 
 interface ParseURLParams {
   link: string;
 }
 
-interface DownloadParams {
-  link: string[];
-}
-
-interface DownloadToAliDriveParams {
-  link: string[];
-  email: string;
+export interface DouyinData {
+  type: string;
+  urls: string[];
+  desc: string;
 }
 
 export const getData = async (
@@ -20,12 +16,27 @@ export const getData = async (
   return getClient().post('/getone', params);
 };
 
+interface DownloadParams {
+  link: string[];
+}
+
+export interface DownloadData {
+  fileName: string;
+  filename: string;
+  data: string;
+}
+
 export const download = async (
   params: DownloadParams
 ): Promise<DownloadData> => {
   return getClient().post('/download', params);
 };
 
+interface DownloadToAliDriveParams {
+  link: string[];
+  email: string;
+}
+
 export const downloadToAliDrive = async (params: DownloadToAliDriveParams) => {
-  return getClient().post('/downloadToAliDrive', params);
+  return getSilentClient().post('/downloadToAliDrive', params);
 }

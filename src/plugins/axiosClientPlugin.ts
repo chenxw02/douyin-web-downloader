@@ -1,6 +1,6 @@
-import { getClient } from '../utils/http';
-import { getAuthInterceptor, getSilentInterceptor } from '../utils/login';
-import { globalValue } from '../utils/global';
+import { getClient } from '@/utils/http';
+import { getAuthInterceptor, getSilentInterceptor } from '@/utils/interceptor';
+import { globalValue } from '@/utils/global';
 import type { App } from 'vue';
 
 export interface Options {

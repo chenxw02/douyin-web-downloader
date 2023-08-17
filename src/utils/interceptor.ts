@@ -1,8 +1,8 @@
-import type { AxiosRequestHeaders } from 'axios';
 import type { Interceptor } from './http';
 import { message as Message } from './message';
 import NProgress from 'nprogress';
 import JSConfetti from 'js-confetti';
+
 export function getAuthInterceptor(): Interceptor {
   return {
     request: {
