@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router';
-import Navbar from '@/components/NavBar.vue';
 import NProgress from 'nprogress';
 NProgress.configure({ showSpinner: false });
 import HomeView from './views/HomeView.vue';
