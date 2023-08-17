@@ -5,10 +5,14 @@ export const modes = [
     },
     {
         value: 'download',
-        label: '仅下载',
+        label: '仅下载到本地',
     },
     {
-        value: 'withAliDrive',
+        value: 'syncWithAliDrive',
         label: '同步到阿里云盘',
     },
+    {
+        value: 'downloadToAliDrive',
+        label: '仅下载到阿里云盘',
+    }
 ];

@@ -45,19 +45,8 @@ button {
   font-size: large;
   box-shadow: none;
   transition: box-shadow 0.3s ease-in-out;
-}
-
-/* button hover时添加阴影 */
-/* button:hover {
-  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
   cursor: pointer;
-} */
-
-/* @media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-} */
+}
 
 @media (max-height: 99vh) {
   #app {

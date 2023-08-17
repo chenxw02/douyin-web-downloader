@@ -1,15 +1,20 @@
-import { message as Message, message } from '@/utils/message';
+import { message as Message } from '@/utils/message';
 
-export const checkURL = (url: string): boolean => {
-  !url.includes('http') && message.warn('请输入正确的链接');
-  return url.includes('http');
-};
 
 export const checkEmail = (email: string): boolean => {
   const reg = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
-  !reg.test(email) && message.warn('请输入正确的邮箱');
+  !reg.test(email) && Message.warn('请输入正确的邮箱');
   return reg.test(email);
 };
+
+export const parseURL = (text: string): string[] => {
+  const urlReg = /(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g;
+  !text.match(urlReg) && Message.warn('请输入正确的链接');
+  // 剔除重复链接
+  return [...new Set(text.match(urlReg) || [])];
+}
+
+
 
 export const downloadFromBase64 = (
   base64Data: string,

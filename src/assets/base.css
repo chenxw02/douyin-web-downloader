@@ -19,6 +19,8 @@
   --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(255, 255, 255, 1);
+  --theme-color: rgba(87, 63, 192, 1);
+  --theme-color-light: rgb(143, 118, 254);
 }
 
 /* semantic color variables for this project */
@@ -80,37 +82,6 @@ body {
 
 .el-message__icon {
   display: none !important;
-  /* 隐藏默认图标 */
-}
-
-
-.el-switch .el-switch__core {
-  /* 设置开关宽度 */
-  height: 30px !important;
-  border-radius: 15px !important;
-  border: 5px #dcdfe6 solid !important;
-  /* 设置开关高度 */
-}
-
-.el-switch.is-checked .el-switch__core {
-  /* 设置开关宽度 */
-
-  border: 5px rgb(63, 131, 192) solid !important;
-  /* 设置开关高度 */
-}
-
-.el-switch .el-switch__core .el-switch_inner {
-  margin: 5px !important;
-}
-
-/* .el-switch .el-switch__core .el-switch__inner .is-text {
-  padding: 5px !important;
-} */
-
-.el-switch.is-checked .el-switch__core {
-  background-color: rgb(63, 131, 192) !important;
-  border: none;
-  /* 设置开关打开时的背景色 */
 }
 
 .el-dialog__header {
@@ -127,10 +98,20 @@ body {
   }
 }
 
-/* styles/scrollbar.css */
+.el-input .el-input__wrapper.is-focus,
+.el-select .el-input.el-input--suffix .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--theme-color) inset !important;
+}
 
-/* 滚动条轨道 */
+.el-select-dropdown__item.selected {
+  color: var(--theme-color) !important;
+}
+
+.el-button.el-button--primary {
+  background-color: var(--theme-color) !important;
+  border: none !important;
+}
+
 ::-webkit-scrollbar {
   width: 0px;
-  /* 设置滚动条宽度 */
 }

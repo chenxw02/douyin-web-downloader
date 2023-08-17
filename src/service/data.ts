@@ -1,27 +1,31 @@
 import { getClient, getSilentClient } from './client';
 import type { DouyinData, DownloadData } from '@/utils/interface';
 
-interface GetSingleURLParams {
+interface ParseURLParams {
   link: string;
 }
 
+interface DownloadParams {
+  link: string[];
+}
+
 interface DownloadToAliDriveParams {
-  link: string;
+  link: string[];
   email: string;
 }
 
 export const getData = async (
-  params: GetSingleURLParams
+  params: ParseURLParams
 ): Promise<DouyinData> => {
   return getClient().post('/getone', params);
 };
 
 export const download = async (
-  params: GetSingleURLParams
+  params: DownloadParams
 ): Promise<DownloadData> => {
   return getClient().post('/download', params);
 };
 
 export const downloadToAliDrive = async (params: DownloadToAliDriveParams) => {
-  return getSilentClient().post('/downloadToAliDrive', params);
-};
+  return getClient().post('/downloadToAliDrive', params);
+}

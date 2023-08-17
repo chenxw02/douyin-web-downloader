@@ -2,22 +2,17 @@
 import { ref, watch } from 'vue';
 import { ElDialog, ElInput, ElButton, ElSelect, ElOption } from 'element-plus';
 import { getData, download, downloadToAliDrive } from '@/service/data';
-import { checkURL, checkEmail, downloadFromBase64 } from '@/utils/validate';
+import { checkEmail, parseURL, downloadFromBase64 } from '@/utils/validate';
 import type { DouyinData } from '@/utils/interface';
 import { linkToAliDrive } from '@/service/alidrive';
 import { modes } from '@/utils/const';
+import { message as Message } from '@/utils/message';
 
 const url = ref('');
-const images = ref<string[]>([]);
-const desc = ref('');
-const video = ref('');
-let imageCount = 0;
-const showGallery = ref(false);
-const showAdvanced = ref(false);
-
 const email = ref('');
 const mode = ref('');
-
+const showAdvanced = ref(false);
+const douyinData = ref<DouyinData>();
 
 mode.value = localStorage.getItem('mode') || 'default';
 email.value = localStorage.getItem('email') || '';
@@ -42,57 +37,41 @@ watch(
 
 const link = async () => {
   if (!checkEmail(email.value)) return;
-  const res = await linkToAliDrive({ email: email.value });
+  await linkToAliDrive({ email: email.value });
   showAdvanced.value = false;
 };
 
 const parse = async () => {
-  if (!checkURL(url.value)) return;
+  const parsedURL = parseURL(url.value);
+  if (!parsedURL.length) console.log('url error');
+  console.log(parsedURL);
 
-  beforeLoad();
+  douyinData.value = undefined;
 
-  const params = {
-    link: url.value,
-  };
+  const mode = localStorage.getItem('mode') || 'default';
+  const email = localStorage.getItem('email') || '';
 
-  if (localStorage.getItem('mode') === 'default') {
-    const data = await getData(params);
-    handleData(data);
-    showGallery.value = true;
-  } else if (localStorage.getItem('mode') === 'withAliDrive') {
-    const data = await getData(params);
-    handleData(data);
-    showGallery.value = true;
-    await downloadToAliDrive({
-      ...params,
-      email: localStorage.getItem('email') || '',
-    });
-  } else {
-    const data = await download(params);
+  if (mode === 'download') { // 仅下载，允许多个链接
+    const data = await download({ link: parsedURL });
     downloadFromBase64(data.data, data.filename);
+  } else if (mode === 'syncWithAliDrive') { // 前端渲染比下载到阿里云，仅允许一个链接
+    if (parsedURL.length > 1) return Message.error('该模式仅允许一个链接');
+    douyinData.value = await getData({ link: parsedURL[0] });
+    await downloadToAliDrive({
+      link: parsedURL,
+      email: email
+    });
+  } else if (mode === 'downloadToAliDrive') { // 仅下载到阿里云，允许多个链接
+    Message.success('下载请求已发送');
+    await downloadToAliDrive({
+      link: parsedURL,
+      email: email
+    });
   }
-};
-
-const handleData = (data: DouyinData) => {
-  desc.value = data.desc;
-  switch (data.type) {
-    case 'images':
-      for (let i = 0; i < data.urls.length; i++) {
-        images.value.push(data.urls[i]);
-      }
-      break;
-    case 'video':
-      video.value = data.urls[0];
-      break;
-    default:
-      break;
+  else { // 默认，前端渲染，仅允许一个链接
+    if (parsedURL.length > 1) return Message.error('该模式仅允许一个链接');
+    douyinData.value = await getData({ link: parsedURL[0] });
   }
-};
-
-const beforeLoad = () => {
-  images.value = [];
-  desc.value = '';
-  showGallery.value = false;
 };
 </script>
 
@@ -108,13 +87,13 @@ const beforeLoad = () => {
       <textarea v-model="url" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
       <button @click="parse">GO</button>
     </div>
-    <div class="gallery" v-show="showGallery">
-      <div class="desc">{{ desc }}</div>
-      <div class="images" v-if="images.length">
-        <img v-for="image in images" :key="image" :src="image" />
+    <div class="gallery" v-show="douyinData">
+      <div class="desc">{{ douyinData?.desc }}</div>
+      <div class="images" v-if="douyinData?.type === 'images'">
+        <img v-for="image in douyinData.urls" :key="image" :src="image" />
       </div>
-      <div class="video" v-if="video">
-        <video controls :src="video">
+      <div class="video" v-else>
+        <video controls :src="douyinData?.urls[0]">
           对不起，您的浏览器不支持内嵌视频。
         </video>
       </div>
@@ -146,14 +125,14 @@ const beforeLoad = () => {
   justify-content: flex-end;
   align-items: center;
   width: 100%;
-  height: 50px;
+  height: 60px;
 
   .icon {
     width: 100%;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding: 0 1rem;
+    padding: 0 20px;
 
     & img {
       width: 30px;
