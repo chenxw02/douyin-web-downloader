@@ -33,8 +33,6 @@ watch(
   { immediate: true }
 );
 
-
-
 const link = async () => {
   if (!checkEmail(email.value)) return;
   await linkToAliDrive({ email: email.value });
@@ -50,24 +48,27 @@ const parse = async () => {
   const mode = localStorage.getItem('mode') || 'default';
   const email = localStorage.getItem('email') || '';
 
-  if (mode === 'download') { // 仅下载，允许多个链接
+  if (mode === 'download') {
+    // 仅下载，允许多个链接
     const data = await download({ link: parsedURL });
     downloadFromBase64(data.data, data.filename);
-  } else if (mode === 'syncWithAliDrive') { // 前端渲染比下载到阿里云，仅允许一个链接
+  } else if (mode === 'syncWithAliDrive') {
+    // 前端渲染比下载到阿里云，仅允许一个链接
     if (parsedURL.length > 1) return Message.error('该模式仅允许一个链接');
     douyinData.value = await getData({ link: parsedURL[0] });
     await downloadToAliDrive({
       link: parsedURL,
-      email: email
+      email: email,
     });
-  } else if (mode === 'downloadToAliDrive') { // 仅下载到阿里云，允许多个链接
+  } else if (mode === 'downloadToAliDrive') {
+    // 仅下载到阿里云，允许多个链接
     Message.success('下载请求已发送');
     await downloadToAliDrive({
       link: parsedURL,
-      email: email
+      email: email,
     });
-  }
-  else { // 默认，前端渲染，仅允许一个链接
+  } else {
+    // 默认，前端渲染，仅允许一个链接
     if (parsedURL.length > 1) return Message.error('该模式仅允许一个链接');
     douyinData.value = await getData({ link: parsedURL[0] });
   }
@@ -77,13 +78,22 @@ const parse = async () => {
 <template>
   <div class="header">
     <div class="icon">
-      <img src="@/assets/icons/settings.png" alt="settings" @click="showAdvanced = true" />
+      <img
+        src="@/assets/icons/settings.png"
+        alt="settings"
+        @click="showAdvanced = true"
+      />
     </div>
   </div>
   <div class="home">
     <div class="title">Douyin Downloader</div>
     <div class="main">
-      <textarea v-model="url" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
+      <textarea
+        v-model="url"
+        placeholder="Paste your URL here"
+        rows="10"
+        cols="50"
+      ></textarea>
       <button @click="parse">GO</button>
     </div>
     <div class="gallery" v-show="douyinData">
@@ -110,10 +120,14 @@ const parse = async () => {
       <div class="mode">
         <p>下载模式</p>
         <el-select v-model="mode" class="m-2" placeholder="Select">
-          <el-option v-for="item in modes" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option
+            v-for="item in modes"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </el-select>
       </div>
-
     </div>
   </el-dialog>
 </template>
@@ -172,12 +186,7 @@ const parse = async () => {
       border-radius: 0.3rem;
       resize: none;
       outline: none;
-      animation: shadow-pulse 1s infinite;
-    }
-
-    & textarea:not(:placeholder-shown) {
-      box-shadow: 0 0 0 2px rgb(77, 165, 247);
-      animation: none;
+      font-size: 16px;
     }
 
     & button {
@@ -231,20 +240,6 @@ const parse = async () => {
     .gallery {
       width: 90%;
     }
-  }
-}
-
-@keyframes shadow-pulse {
-  0% {
-    box-shadow: 0 0 0 2px rgb(77, 165, 247);
-  }
-
-  50% {
-    box-shadow: 0 0 0 6px rgba(51, 204, 255, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 2px rgb(77, 165, 247);
   }
 }
 

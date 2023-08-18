@@ -1,4 +1,4 @@
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 export const message = {
   warn: (msg: string) => {
@@ -24,5 +24,11 @@ export const message = {
       message: msg,
       duration: 2000,
     });
+  },
+};
+
+export const messageBox = {
+  alert: (msg: string) => {
+    ElMessageBox.alert(msg, '错误');
   },
 };

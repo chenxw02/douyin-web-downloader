@@ -7,7 +7,7 @@ export interface Options {
   /** 后端API路径 */
   baseURL: string;
   /** 错误处理 */
-  onHttpError: (err: any) => Promise<any>;
+  onHttpError: (err: any) => void;
 }
 
 export const AxiosClientPlugin = {

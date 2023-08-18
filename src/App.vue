@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import NProgress from 'nprogress';
-NProgress.configure({ showSpinner: false });
 import HomeView from './views/HomeView.vue';
 </script>
 
