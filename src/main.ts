@@ -1,4 +1,4 @@
-import './assets/main.css';
+import './assets/base.css';
 import 'element-plus/dist/index.css';
 import { createApp } from 'vue';
 import App from './App.vue';
@@ -17,11 +17,11 @@ const baseURL = isProduction
 const app = createApp(App);
 app
   .use(AxiosClientPlugin, {
-    baseURL: baseURL,
+    baseURL: '',
     onHttpError,
   })
   .use(SilentAxiosClientPlugin, {
-    baseURL: baseURL,
+    baseURL: '',
     onHttpError,
   });
 
