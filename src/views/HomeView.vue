@@ -43,7 +43,7 @@ const parse = async () => {
   const parsedURL = parseURL(url.value);
   if (!parsedURL.length) return;
 
-  douyinData.value = undefined;
+  // douyinData.value = undefined;
 
   const mode = localStorage.getItem('mode') || 'default';
   const email = localStorage.getItem('email') || '';
@@ -90,7 +90,18 @@ const parse = async () => {
     <div class="gallery" v-show="douyinData">
       <div class="desc">{{ douyinData?.desc }}</div>
       <div class="images" v-if="douyinData?.type === 'images'">
-        <img v-for="image in douyinData.urls" :key="image" :src="image" />
+        <div class="column1">
+          <a v-for="image in douyinData.urls.filter((value, index) => index % 2 !== 0)" :key="image" :href="image"
+            target="_blank">
+            <img :src="image" />
+          </a>
+        </div>
+        <div class="column2">
+          <a v-for="image in douyinData.urls.filter((value, index) => index % 2 === 0)" :key="image" :href="image"
+            target="_blank">
+            <img :src="image" />
+          </a>
+        </div>
       </div>
       <div class="video" v-else>
         <video controls :src="douyinData?.urls[0]">
@@ -157,19 +168,26 @@ const parse = async () => {
     margin: 5% 0 0 0;
   }
 
+  @media (max-width: 500px) {
+    .title {
+      margin: 30% 0 0 0;
+    }
+  }
+
   .main {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 500px;
-    margin: 3rem 0 1rem 0;
+    margin: 48px 0 16px 0;
 
     & textarea {
       width: 100%;
       height: 200px;
-      border: 0.5rem solid #ffffff;
-      border-radius: 0.3rem;
+      border: none;
+      border-radius: 6px;
+      padding: 20px;
       resize: none;
       outline: none;
       font-size: 16px;
@@ -177,11 +195,19 @@ const parse = async () => {
 
     & button {
       width: 100%;
-      margin-top: 1rem;
+      margin-top: 16px;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: large;
+      color: var(--theme-color);
+      background-color: white;
+      box-shadow: none;
+      cursor: pointer;
     }
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 500px) {
     .main {
       width: 90%;
     }
@@ -204,12 +230,18 @@ const parse = async () => {
     .images {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      grid-gap: 20px;
+      grid-gap: 16px;
 
-      & img {
-        margin-bottom: 0.5rem;
-        width: 100%;
-        border-radius: 0.5rem;
+      .column1,
+      .column2 {
+        display: flex;
+        flex-direction: column;
+
+        & img {
+          margin-bottom: 10px;
+          width: 100%;
+          border-radius: 8px;
+        }
       }
     }
 
@@ -222,9 +254,17 @@ const parse = async () => {
     }
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 500px) {
     .gallery {
       width: 90%;
+
+      .images {
+        grid-gap: 10px;
+
+        & img {
+          margin-bottom: 10px;
+        }
+      }
     }
   }
 }
