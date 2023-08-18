@@ -1,6 +1,6 @@
 import type { Interceptor } from './http';
 import { message as Message } from './message';
-import NProgress from 'nprogress';
+import { start as Nstart, close as NClose } from './nprogress';
 import JSConfetti from 'js-confetti';
 
 export function getAuthInterceptor(): Interceptor {
@@ -11,13 +11,13 @@ export function getAuthInterceptor(): Interceptor {
         if (!config.headers) {
           config.headers = {};
         }
-        NProgress.start();
+        Nstart();
         return config;
       },
     },
     response: {
       afterReceive: (res) => {
-        NProgress.done();
+        NClose();
         if (res.status >= 200 && res.status < 400) {
           if (res.data && res.data.error) {
             return Promise.reject(res.data.error);

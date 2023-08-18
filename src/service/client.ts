@@ -1,9 +1,10 @@
 import { message as Message, messageBox as MessageBox } from '@/utils/message';
-import { getClient as originGetClient } from '../utils/http';
-import { globalValue } from '../utils/global';
-import NProgress from 'nprogress';
+import { getClient as originGetClient } from '@/utils/http';
+import { globalValue } from '@/utils/global';
+import { close as NClose } from '@/utils/nprogress';
 
 export function onHttpError(err: any) {
+  NClose();
   switch (err.code) {
     case 'LOGIN_ERROR':
       MessageBox.alert('登录失败');
@@ -12,8 +13,6 @@ export function onHttpError(err: any) {
       Message.error(err.message);
       break;
   }
-
-  NProgress.done();
 }
 
 export function getClient(): ReturnType<typeof originGetClient> {

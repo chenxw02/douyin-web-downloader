@@ -78,22 +78,13 @@ const parse = async () => {
 <template>
   <div class="header">
     <div class="icon">
-      <img
-        src="@/assets/icons/settings.png"
-        alt="settings"
-        @click="showAdvanced = true"
-      />
+      <img src="@/assets/icons/settings.png" alt="settings" @click="showAdvanced = true" />
     </div>
   </div>
   <div class="home">
     <div class="title">Douyin Downloader</div>
     <div class="main">
-      <textarea
-        v-model="url"
-        placeholder="Paste your URL here"
-        rows="10"
-        cols="50"
-      ></textarea>
+      <textarea v-model="url" placeholder="Paste your URL here" rows="10" cols="50"></textarea>
       <button @click="parse">GO</button>
     </div>
     <div class="gallery" v-show="douyinData">
@@ -120,12 +111,7 @@ const parse = async () => {
       <div class="mode">
         <p>下载模式</p>
         <el-select v-model="mode" class="m-2" placeholder="Select">
-          <el-option
-            v-for="item in modes"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          />
+          <el-option v-for="item in modes" :key="item.value" :label="item.label" :value="item.value" />
         </el-select>
       </div>
     </div>
