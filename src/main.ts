@@ -11,7 +11,7 @@ import { onHttpError } from '@/service/client';
 const isProduction = import.meta.env.PROD;
 
 const baseURL = isProduction
-  ? 'http://39.107.136.222:8089' // 使用生产环境的 baseURL
+  ? 'https://39.107.136.222:8089' // 使用生产环境的 baseURL
   : 'http://localhost:8089'; // 使用开发环境的 baseURL
 
 const app = createApp(App);
